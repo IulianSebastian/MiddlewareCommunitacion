@@ -1,4 +1,4 @@
-# XMLRPC IMPORT
+# xmlrpc IMPORT
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 from xmlrpc.server import SimpleXMLRPCServer
 
@@ -35,7 +35,7 @@ with SimpleXMLRPCServer(('localhost',8000),requestHandler=RequestHandler,allow_n
                 for ob in self.listObservers:
                     observer = xmlrpc.client.ServerProxy(f"{ob}")
                     observer.notify(choice)
-                    print(f"{choice}")
+                    # print(f"{choice}")
                 time.sleep(5)
         
         def activateBroadcast(self):
@@ -49,11 +49,11 @@ with SimpleXMLRPCServer(('localhost',8000),requestHandler=RequestHandler,allow_n
 
         def addObserver(self,url):
             self.listObservers.append(url)
-            print(f"This {url} has been added as a suscriber")
+            return print(f"This {url} has been added as a suscriber")
         
         def deleteObserver(self,url):
             self.listObservers.remove(url)
-            print(f"This {url} has been deleted as a suscriber")
+            return print(f"This {url} has been deleted as a suscriber")
 
     server.register_instance(InsultServer()) 
     server.serve_forever()
