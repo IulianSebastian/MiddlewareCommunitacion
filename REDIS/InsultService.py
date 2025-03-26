@@ -5,13 +5,14 @@ import multiprocessing
 
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
-listName = "listInsults"
 setList = "setInsults"
-news = "news_channel"
+insultChannel= "insultChannel"
+observerChannel = "newsChannel"
 proc = None
 
 # Methods for the Broadcast Utility
 def activateBroadcast():
+    global proc
     if (proc is None) or (not proc.is_alive()):
         proc = multiprocessing.Process(target=broadcaster)
         proc.start()
@@ -22,19 +23,23 @@ def deactivateBroadcast():
 
 def broadcaster():
     while True:
-        choice = random.choice(client.lrange(setList,0,-1))
-        client.lpush(news,choice)
+        insultlist = client.smembers(setList)
+        if insultlist:
+            choice = random.choice(list(insultlist))
+            client.publish(observerChannel,choice)
         time.sleep(5)
 
 # InsultService request and activate/deactivate.Broadcast
-while True:
-    task = client.lpop(listName)
-    if task is not None:
-        match task[0]:
-            case 1:
+pubsub = client.pubsub()
+pubsub.subscribe(insultChannel)
+
+for message in pubsub.listen():
+    if message["type"] == "message":
+        match message["data"][0]:
+            case "1":
                 activateBroadcast()
-            case 2:
+            case "2":
                 deactivateBroadcast()
             case _:
-                client.sadd(setList,task)
-    time.sleep(3)
+                print(message["data"])
+                client.sadd(setList,message["data"])

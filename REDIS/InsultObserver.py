@@ -3,12 +3,10 @@ import time
 
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
-listName = "listInsults"
-setList = "setInsults"
+pubsub = client.pubsub()
+observerChannel = "newsChannel"
+pubsub.subscribe(observerChannel)
 
-while True:
-    task = client.lpop(listName)
-    if task is not None:
-        print(task)
-        client.sadd(setList,task)
-        time.sleep(3)
+for message in pubsub.listen():
+    if message["type"] == "message":
+        print(f"The message {message['data']}")
