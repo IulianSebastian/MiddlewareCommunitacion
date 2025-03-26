@@ -10,6 +10,7 @@ setList = "setInsults"
 news = "news_channel"
 proc = None
 
+# Methods for the Broadcast Utility
 def activateBroadcast():
     if (proc is None) or (not proc.is_alive()):
         proc = multiprocessing.Process(target=broadcaster)
@@ -25,6 +26,7 @@ def broadcaster():
         client.lpush(news,choice)
         time.sleep(5)
 
+# InsultService request and activate/deactivate.Broadcast
 while True:
     task = client.lpop(listName)
     if task is not None:
