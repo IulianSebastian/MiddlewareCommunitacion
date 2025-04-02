@@ -2,14 +2,23 @@ import Pyro4
 import Pyro4.core
 import time
 import random
+import multiprocessing
 
 @Pyro4.expose
 class Service:
-    insults=[]
-    subscribers=[]
+    manager = multiprocessing.Manager()    
+    insults= manager.list()
+    subscribers=manager.list()
+    proces = None
     iteration=0
     def get_insults(self):
-        return self.insults
+        if len(self.insults) == 0: return None
+        return list(self.insults)
+    
+    #For testing server stress
+    def insult_me(self):
+        if len(self.insults) == 0: return "Insults list is empty"
+        return random.choice(self.insults)
     
     def add_insult(self, insult):
         if insult in self.insults:
@@ -31,17 +40,35 @@ class Service:
             return(f"Removed {client}")
         else:
             return(f"Error: {client} isn't registered")
-    
     def broadcast(self):
         while True:
-            random_insult = random.choice(self.insults)
-            for sub in self.subscribers:
-                print(f"Notifying {sub}...")
-                Pyro4.Proxy(f"PYRONAME:{sub}").update(f"Random Insult for subscribers {self.iteration}: {random_insult} ")       
-                self.iteration+=1
+            if len(self.insults) != 0:
+                random_insult = random.choice(self.insults)
+                for sub in self.subscribers:
+                    print(f"Notifying {sub}...")
+                    Pyro4.Proxy(f"PYRONAME:{sub}").update(f"Random Insult for subscribers {self.iteration}: {random_insult} ")       
+                    self.iteration+=1
             time.sleep(5)
-    
-    
+            
+    def activate_broadcast(self):
+        if self.proces == None:
+            self.proces = multiprocessing.Process(target=self.broadcast)
+            self.proces.start()
+            print("Starting pyro broadcast...")
+            return ("Starting pyro broadcast...")
+        else:
+            print("Pyro broadcast is already started")
+            return ("Pyro broadcast is already started")
+        
+    def disable_broadcast(self):
+        if self.proces == None:
+            print("Pyro broadcast is already disable")
+        else:
+            print("Finishing pyro broadcast...")
+            self.proces.terminate()
+            self.proces = None
+      
+
         
 daemon = Pyro4.Daemon()
 ns = Pyro4.locateNS()
