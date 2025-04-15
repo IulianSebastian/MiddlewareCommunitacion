@@ -1,26 +1,11 @@
 # xmlrpc IMPORT
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 from xmlrpc.server import SimpleXMLRPCServer
-import xmlrpc.client
-
-import signal 
 import sys
-
 sys.path.insert(0,'../../')
-
 from insults import listInsults
 
-port=int(input("In which port do you want to start the InsultFilterWorker ? "))
-
-s = xmlrpc.client.ServerProxy('http://localhost:8000')
-s.add_worker(port)
-
-def signal_handler(sig,frame):
-    print(f'Removing worker in port = {port}')
-    s.remove_worker(port)
-    sys.exit(0)
-
-signal.signal(signal.SIGINT,signal_handler)
+port = int(sys.argv[1])
 
 class RequestHandler(SimpleXMLRPCRequestHandler): 
     rpc_paths = ('/RPC2')
@@ -35,6 +20,7 @@ with SimpleXMLRPCServer(('localhost',port),requestHandler=RequestHandler,allow_n
             return self.phrases
 
         def work(self, phrase):
+            print(f"Worker == {phrase}")
             for insult in listInsults.insult:
                 if insult in phrase:
                     self.phrases.append(phrase.replace(insult,"CENSORED"))

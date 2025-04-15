@@ -1,40 +1,53 @@
 # xmlrpc IMPORT
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 from xmlrpc.server import SimpleXMLRPCServer
+import multiprocessing
 import xmlrpc.client
-import signal 
+import subprocess
 import sys
 
-class RequestHandler(SimpleXMLRPCRequestHandler): 
-    rpc_paths = ('/RPC2')
+# proc = [] 
+workers = []
 
-with SimpleXMLRPCServer(('localhost',8000),requestHandler=RequestHandler,allow_none=True) as server:
-    server.register_introspection_functions()
+# Round Robin method to repart the work to the workers
+def insult_server():
+    class RequestHandler(SimpleXMLRPCRequestHandler): 
+        rpc_paths = ('/RPC2')
 
-    class InsultFilterServer:
-        workers = []
+    with SimpleXMLRPCServer(('localhost',8000),requestHandler=RequestHandler,allow_none=True) as server:
+        server.register_introspection_functions()
 
-        def get_insults(self):
-            list = []
-            for worker in self.workers:
-                list.append(xmlrpc.client.ServerProxy(f'http://localhost:{worker}').get_insults())
-            return list
-        
-        def add_insult(self,phrase):
-            if self.workers:
-                work = self.workers.pop(0)
+        class InsultFilterServer:
+
+            def get_insults(self):
+                list = []
+                for worker in workers:
+                    list.append(xmlrpc.client.ServerProxy(f'http://localhost:{worker}').get_insults())
+                return list
+            
+            def add_insult(self,phrase):
+                work = workers.pop(0)
                 xmlrpc.client.ServerProxy(f'http://localhost:{work}').work(phrase)
-                self.workers.append(work)
-            else:
-                return 'There are no workers'
+                workers.append(work)
 
-        def add_worker(self, port):
-            self.workers.append(port)
+        server.register_instance(InsultFilterServer()) 
+        server.serve_forever()
 
-        def remove_worker(self,port):
-            self.workers.remove(port)
+# Execute a worker in the backgorund
+def worker(port):
+    subprocess.Popen(["python3", "InsultFilterWorker.py", str(port)])
 
+# Start all the specified workers
+def start_workers(num_workers):
+    for i in range(num_workers):
+        port = i+8080
+        process = multiprocessing.Process(target=worker(port))
+        process.start()
+        # proc.append(process)
+        workers.append(port)
 
-    server.register_instance(InsultFilterServer()) 
-    server.serve_forever()
-    
+if __name__ == "__main__":
+    # num_workers = int(input("How many workers do you want to have ?"))
+    num_workers = int(sys.argv[1])
+    start_workers(num_workers)
+    insult_server()
