@@ -12,33 +12,41 @@ class Service:
     proces = None
     iteration=0
     def get_insults(self):
+        print("Sending insults list...")
         if len(self.insults) == 0: return None
         return list(self.insults)
     
     #For testing server stress
     def insult_me(self):
         if len(self.insults) == 0: return "Insults list is empty"
+        print("Insult me...")
         return random.choice(self.insults)
     
     def add_insult(self, insult):
         if insult in self.insults:
+            print(f"{insult} is already in list!")
             return(f"{insult} is already in list!")
         else:
             self.insults.append(insult)
+            print(f"{insult} added!")
             return (f"{insult} added!")
         
     def subscribe(self, client):
         if client in self.subscribers:
+            print(f"{client} is already registered!")
             return (f"{client} is already registered!")
         else:
             self.subscribers.append(client)
+            print(f"{client} subscribed!")
             return (f"{client} subscribed!")
     
     def unsubscribe(self, client):
         if client in self.subscribers:
             self.subscribers.remove(client)
+            print(f"Removed {client}")
             return(f"Removed {client}")
         else:
+            print(f"Error: {client} isn't registered")
             return(f"Error: {client} isn't registered")
     def broadcast(self):
         while True:
@@ -74,4 +82,5 @@ daemon = Pyro4.Daemon()
 ns = Pyro4.locateNS()
 uri = daemon.register(Service)
 ns.register("insult.service", uri)
+print("Waiting for requests...")
 daemon.requestLoop()
