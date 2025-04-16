@@ -43,12 +43,19 @@ def disableBroadcast():
     else:
         print("Broadcast isn't active")
 
+def listInsults(ch, props):
+    response = ", ".join(insults)
+    print("Sending insult list to", props.reply_to)
+    ch.basic_publish(exchange='', routing_key=props.reply_to, body=response)
+
 def on_message(ch, method, properties, body):
     msg = body.decode().strip()
     if msg == "1":
         activateBroadcast()
     elif msg == "2":
         disableBroadcast()
+    elif msg == "3":
+        listInsults(ch, properties)
     else:
         if msg not in insults:
             insults.append(msg)
