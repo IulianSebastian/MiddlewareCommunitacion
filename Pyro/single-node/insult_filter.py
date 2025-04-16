@@ -27,6 +27,7 @@ daemon = Pyro4.Daemon()
 ns = Pyro4.locateNS()
 uri = daemon.register(Filter)
 ns.register("insult.filter", uri)
+print("Waiting for text...")
 daemon.requestLoop()
 
 

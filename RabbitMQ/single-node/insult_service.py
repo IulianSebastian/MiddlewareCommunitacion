@@ -13,14 +13,14 @@ channel = connection.channel()
 channel.queue_declare(queue='insultChannel')
 channel.exchange_declare(exchange='subscribers', exchange_type='fanout')
 
-def broadcaster(shared_insults):
+def broadcaster():
     conn = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     ch = conn.channel()
     ch.exchange_declare(exchange='subscribers', exchange_type='fanout')
     while True:
-        print(f"{list(shared_insults)}")
-        if shared_insults:
-            insult = random.choice(shared_insults)
+        print(f"{list(insults)}")
+        if insults:
+            insult = random.choice(insults)
             ch.basic_publish(exchange='subscribers', routing_key='', body=insult)
             print(f'Broadcast: {insult}')
         time.sleep(5)
@@ -29,7 +29,7 @@ def activateBroadcast():
     global proc
     if proc is None or not proc.is_alive():
         print("Activating broadcast...")
-        proc = multiprocessing.Process(target=broadcaster, args=(insults,))
+        proc = multiprocessing.Process(target=broadcaster)
         proc.start()
     else:
         print("Broadcast is already active")

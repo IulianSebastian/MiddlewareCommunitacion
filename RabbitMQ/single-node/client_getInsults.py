@@ -1,12 +1,10 @@
 import pika
-import uuid
 
 def on_response(ch, method, props, body):
     global response
     response = body.decode()
      
 response = None
-#corr_id = str(uuid.uuid4())
         
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
