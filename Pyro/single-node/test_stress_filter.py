@@ -4,11 +4,11 @@ from multiprocessing import Process, Value, Lock
 
 def spam(counter, lock):
     ns = Pyro4.locateNS()
-    uri = ns.lookup("insult.service")
+    uri = ns.lookup("insult.filter")
     server = Pyro4.Proxy(uri)
     
     while True:
-        server.insult_me()
+        server.send_text("TEXT DE PROVA")
         with lock:
             counter.value += 1
         
