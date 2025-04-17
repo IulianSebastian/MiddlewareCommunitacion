@@ -2,6 +2,16 @@
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 from xmlrpc.server import SimpleXMLRPCServer
 import xmlrpc.client
+import signal
+
+service = xmlrpc.client.ServerProxy('http://localhost:8000')
+
+def deleteObs(signum,frame):
+    print(service.deactivateBroadcast())
+    print(service.deleteObserver('http://localhost:4848'))
+    exit()
+
+signal.signal(signal.SIGTERM, deleteObs)
 
 class RequestHandler(SimpleXMLRPCRequestHandler): 
     rpc_paths = ('/RPC2')
@@ -14,7 +24,6 @@ with SimpleXMLRPCServer(('localhost',4848),requestHandler=RequestHandler,allow_n
 
     server.register_function(notify)
 
-    service = xmlrpc.client.ServerProxy('http://localhost:8000')
-    service.addObserver('http://localhost:4848')
-    service.activateBroadcast()
+    print(service.addObserver('http://localhost:4848'))
+    print(service.activateBroadcast())
     server.serve_forever()
