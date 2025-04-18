@@ -2,37 +2,38 @@ import Pyro4
 import time
 from multiprocessing import Process, Value, Lock
 
-def spam(counter, lock):
+TOTAL_PETICIONS=5000
+NUM_PROCESSOS=4
+PETICIONS_PER_PROC=5000//4
+
+def spam(counter, lock, total_peticions):
     ns = Pyro4.locateNS()
     uri = ns.lookup("insult.filter")
     server = Pyro4.Proxy(uri)
     
-    while True:
+    while counter.value < total_peticions:
         server.send_text("TEXT DE PROVA")
         with lock:
             counter.value += 1
-        
+
 def main():
     counter = Value('i', 0)  
     lock = Lock()
-    n_peticions=0
+
+    start_time = time.time()
 
     procesos = []
-    for _ in range(10):  
-        p = Process(target=spam, args=(counter, lock))
+    for _ in range(NUM_PROCESSOS):
+        p = Process(target=spam, args=(counter, lock, PETICIONS_PER_PROC))
         p.start()
         procesos.append(p)
 
-    for _ in range(10):
-        time.sleep(1)
-        with lock:
-            print(f"Peticions per segon: {counter.value}")
-            n_peticions+=counter.value
-            counter.value = 0
-    print(f"Mitja de peticions per segon: {int(n_peticions/10)}")
-    
     for proces in procesos:
-        proces.terminate()
-    
+        proces.join()
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Temps total d'execució per les 5000 peticions: {elapsed_time} segons")
+
 if __name__ == "__main__":
     main()

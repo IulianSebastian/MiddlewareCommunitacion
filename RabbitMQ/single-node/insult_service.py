@@ -4,7 +4,7 @@ import random
 import multiprocessing
 
 manager = multiprocessing.Manager()
-insults = manager.list()  # Lista compartida entre procesos
+insults = manager.list()  # Llista compartida entre procesos
 proc = None
 
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
