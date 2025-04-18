@@ -48,6 +48,11 @@ def listInsults(ch, props):
     print("Sending insult list to", props.reply_to)
     ch.basic_publish(exchange='', routing_key=props.reply_to, body=response)
 
+def insult_me(ch,props):
+    response=random.choice(insults)
+    print("Insult me...")
+    ch.basic_publish(exchange='', routing_key=props.reply_to, body=response)    
+    
 def on_message(ch, method, properties, body):
     msg = body.decode().strip()
     if msg == "1":
@@ -56,6 +61,8 @@ def on_message(ch, method, properties, body):
         disableBroadcast()
     elif msg == "3":
         listInsults(ch, properties)
+    elif msg== "4":
+        insult_me(ch,properties)
     else:
         if msg not in insults:
             insults.append(msg)
