@@ -7,6 +7,8 @@ TOTAL_PETICIONS = 5000
 NUM_PROCESSOS = 4
 PETICIONS_PER_PROC = TOTAL_PETICIONS // NUM_PROCESSOS
 FILTER_NAMES = ["insult.filter1", "insult.filter2"]
+SERVICE_NAMES = ["insult.service1", "insult.service2"]
+INSULTS = ["CAVERO", "UCRANIANO", "RUMANO","VENEZOLANO","REUSENC", "MOLARENC"]
 
 def spam(counter, lock, total_peticions, uris):
     rr = cycle(uris)
@@ -20,8 +22,15 @@ def spam(counter, lock, total_peticions, uris):
 def main():
     counter = Value('i', 0)
     lock = Lock()
-
     ns = Pyro4.locateNS()
+    
+    for name in SERVICE_NAMES:
+        uri = ns.lookup(name)
+        server = Pyro4.Proxy(uri)
+        for insult in INSULTS:
+            server.add_insult(insult)
+    
+    
     uris = [ns.lookup(name) for name in FILTER_NAMES]
 
     procesos = []

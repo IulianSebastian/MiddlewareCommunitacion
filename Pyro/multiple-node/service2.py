@@ -81,6 +81,6 @@ class Service:
 daemon = Pyro4.Daemon()
 ns = Pyro4.locateNS()
 uri = daemon.register(Service)
-ns.register("insult.service", uri)
+ns.register("insult.service2", uri)
 print("Waiting for requests...")
 daemon.requestLoop()
