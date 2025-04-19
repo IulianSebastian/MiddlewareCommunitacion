@@ -37,22 +37,24 @@ class Testing(unittest.TestCase):
     def test_broadcast(cls):
 
         messageObserver = None
-        cls.client.publish(cls.insultChannel,"1")
+        cls.client.publish("insultChannel","1")
         
         pubsub = cls.client.pubsub()
-        pubsub.subscribe(cls.observerChannel)
+        pubsub.subscribe("observerChannel")
 
         for message in pubsub.listen():
+            print("here")
             if message["type"] == "message":
+                print(message)
                 messageObserver = message["data"]
-                cls.client.publish(cls.insultChannel,"2")
+                cls.client.publish("insultChannel","2")
                 break
 
         cls.assertEqual("loco",messageObserver)
         
     def worker(cls):
         cls.service = subprocess.Popen(
-            ["python3", "../../REDIS/single_node/InsultService.py"],
+            ["python3", "../../REDIS/service/InsultService.py","insultChannel","observerChannel"],
             preexec_fn=os.setsid 
         )
 

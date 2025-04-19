@@ -1,4 +1,6 @@
+#python3 InsultFilter.py Queue_where_to_work
 import redis
+import sys
 
 insult = [
     "cavero",
@@ -8,7 +10,7 @@ insult = [
 ]
 
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
-work_queue = "work_queue"
+work_queue = sys.argv[1]
 
 def censore(message):
     listCensored="listCensored"

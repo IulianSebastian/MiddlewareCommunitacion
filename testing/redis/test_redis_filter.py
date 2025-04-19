@@ -33,7 +33,7 @@ class Testing(unittest.TestCase):
         
     def worker(cls):
         cls.service = subprocess.Popen(
-            ["python3", "../../REDIS/single_node/InsultFilter.py"],
+            ["python3", "../../REDIS/filter/InsultFilter.py","work_queue"],
             preexec_fn=os.setsid 
         )
 
