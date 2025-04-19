@@ -10,18 +10,18 @@ proc = None
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
 
-channel.queue_declare(queue='insultChannel')
-channel.exchange_declare(exchange='subscribers', exchange_type='fanout')
+channel.queue_declare(queue='insultChannel2')
+channel.exchange_declare(exchange='subscribers2', exchange_type='fanout')
 
 def broadcaster():
     conn = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     ch = conn.channel()
-    ch.exchange_declare(exchange='subscribers', exchange_type='fanout')
+    ch.exchange_declare(exchange='subscribers2', exchange_type='fanout')
     while True:
         print(f"{list(insults)}")
         if insults:
             insult = random.choice(insults)
-            ch.basic_publish(exchange='subscribers', routing_key='', body=insult)
+            ch.basic_publish(exchange='subscribers2', routing_key='', body=insult)
             print(f'Broadcast: {insult}')
         time.sleep(5)
 
@@ -54,7 +54,7 @@ def insult_me(ch,props):
         print("Insult me...")
     else:
         response="NO HI HA INSULTS A LA LLISTA"
-    ch.basic_publish(exchange='', routing_key=props.reply_to, body=response)   
+    ch.basic_publish(exchange='', routing_key=props.reply_to, body=response)    
     
 def on_message(ch, method, properties, body):
     msg = body.decode().strip()
@@ -73,7 +73,7 @@ def on_message(ch, method, properties, body):
         else:
             print(f"Already exists: {msg}")
 
-channel.basic_consume(queue='insultChannel', on_message_callback=on_message, auto_ack=True)
+channel.basic_consume(queue='insultChannel2', on_message_callback=on_message, auto_ack=True)
 
-print("Waiting for messages in 'insultChannel'...")
+print("Waiting for messages in 'insultChannel2'...")
 channel.start_consuming()
