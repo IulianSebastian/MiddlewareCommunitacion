@@ -45,4 +45,5 @@ for message in pubsub.listen():
                 print("Deactivating broadcast")
                 deactivateBroadcast()
             case _:
+                print(message["data"])
                 client.sadd(setList, message["data"])

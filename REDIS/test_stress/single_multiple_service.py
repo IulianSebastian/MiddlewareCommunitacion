@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import multiprocessing
+import numpy as np
 import redis
 import random
 import time
@@ -18,13 +19,11 @@ setList = "setInsults"
 def redis_client_multiple(x, y, barrier,nodes,f):
     for w in range(y):
         nodes.append(nodes.pop(0))
-    # print(nodes)
     barrier.wait()
     for i in range(x):
         node = nodes.pop(0)
         client.publish(node,f'{random.choice(insults)}{i}_{f}')
         nodes.append(node)
-
 
 def redis_client_single(x,f):
     for i in range(x):
@@ -57,7 +56,6 @@ def execute_service_redis_multiple(x,nodes):
     processos = []
     client.delete("setInsults")
 
-    # Crear barrera para sincronizar 4 procesos
     barrier = multiprocessing.Barrier(4)
     start = time.time()
 
@@ -86,27 +84,32 @@ temps_multiple3 = []
 
 for pet in peticions:
     temps_single.append(execute_service_redis_single(pet))
-print("Passed")
 
 for pet in peticions:
     temps_multiple2.append(execute_service_redis_multiple(pet,["insultChannel","insultChannel2"]))
-    time.sleep(10)
-print("Passed")
 
 for pet in peticions:
     temps_multiple3.append(execute_service_redis_multiple(pet,["insultChannel","insultChannel2","insultChannel3"]))
 
 
+print(temps_single)
 print(temps_multiple2)
 print(temps_multiple3)
 print(peticions)
 
-plt.plot(peticions, temps_single, marker='o',label='single')
-plt.plot(peticions, temps_multiple2, marker='^',label='multiple2')
-plt.plot(peticions, temps_multiple3, marker='s',label='multiple3')
-plt.title('Redis')
+bar_width = 0.2
+x_indices = np.arange(len(peticions))
+plt.bar(x_indices - bar_width, temps_single, width=bar_width, label='Single')
+plt.bar(x_indices, temps_multiple2, width=bar_width, label='Two Nodes')
+plt.bar(x_indices + bar_width, temps_multiple3, width=bar_width, label='Three Nodes')
+plt.title('Filter XMLRPC')
 plt.xlabel('Peticions')
 plt.ylabel('Temps')
+plt.xticks(x_indices, peticions)
 plt.legend()
-plt.grid(True) 
-plt.show() 
+plt.show()
+
+# [10.050384283065796, 19.66714096069336, 40.34549069404602, 51.6276638507843, 62.14417338371277, 79.64058780670166, 105.47357130050659, 208.0698630809784]
+# [7.361161470413208, 14.801243305206299, 28.36282730102539, 36.64431405067444, 46.60725116729736, 57.75472116470337, 73.34221863746643, 144.22041082382202]
+# [6.037182092666626, 11.763497591018677, 22.980233430862427, 28.807119131088257, 34.28817582130432, 45.06152558326721, 57.09370422363281, 112.00985908508301]
+# [5000, 10000, 20000, 25000, 30000, 40000, 50000, 100000]
