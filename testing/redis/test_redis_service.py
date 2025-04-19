@@ -52,7 +52,7 @@ class Testing(unittest.TestCase):
         
     def worker(cls):
         cls.service = subprocess.Popen(
-            ["python3", "../../REDIS/InsultService.py"],
+            ["python3", "../../REDIS/single_node/InsultService.py"],
             preexec_fn=os.setsid 
         )
 
