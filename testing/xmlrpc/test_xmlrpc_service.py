@@ -29,7 +29,7 @@ class Testing(unittest.TestCase):
     def test_observer(self):
         with open("observer.txt", "w") as sal:
             observer = subprocess.Popen(
-                ["python3", "-u", "../../XMLRPC/InsultObserver.py"],
+                ["python3", "-u", "../../XMLRPC/single_node/service/InsultObserver.py"],
                 stdout=sal,
                 stderr=sal,
                 preexec_fn=os.setsid
@@ -52,7 +52,7 @@ class Testing(unittest.TestCase):
 
     def worker(cls):
         cls.service = subprocess.Popen(
-            ["python3", "../../XMLRPC/InsultService.py"],
+            ["python3", "../../XMLRPC/single_node/service/InsultService.py"],
             preexec_fn=os.setsid  # Esto hace que el proceso esté en su propio grupo
         )
 
