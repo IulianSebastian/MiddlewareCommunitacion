@@ -11,6 +11,7 @@ class Testing(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.service = None
+        cls.working = None
         multiprocessing.Process(target=cls.worker(cls)).start()
         time.sleep(2)
         cls.client = xmlrpc.client.ServerProxy('http://localhost:8080')
@@ -30,7 +31,12 @@ class Testing(unittest.TestCase):
 
     def worker(cls):
         cls.service = subprocess.Popen(
-            ["python3", "../../XMLRPC/WorkQueue/InsultFilterWorker.py","8080"],
+            ["python3", "../../XMLRPC/filter/InsultFilterServer.py","8080"],
+            preexec_fn=os.setsid 
+        )
+        time.sleep(5)
+        cls.working = subprocess.Popen(
+            ["python3", "../../XMLRPC/filter/InsultFilterWorker.py","8080","8081"],
             preexec_fn=os.setsid 
         )
 
