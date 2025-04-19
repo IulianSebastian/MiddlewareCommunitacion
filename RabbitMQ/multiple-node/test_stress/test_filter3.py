@@ -7,8 +7,8 @@ import random
 TOTAL_PETICIONS = 5000
 NUM_PROCESOS = 4
 PETICIONS_PER_PROC = TOTAL_PETICIONS // NUM_PROCESOS
-SERVEIS = ["insultChannel1", "insultChannel2"]
-CANALS = ["WorkQueue1", "WorkQueue2"]
+SERVEIS = ["insultChannel1", "insultChannel2", "insultChannel3"]
+CANALS = ["WorkQueue1", "WorkQueue2", "WorkQueue3"]
 INSULTS = ["CAVERO", "UCRANIANO", "RUMANO","VENEZOLANO","REUSENC", "MOLARENC"]
 
 def spam(counter, lock, n_peticions, canals):
