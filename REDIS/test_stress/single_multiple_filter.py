@@ -41,7 +41,7 @@ def execute_service_redis_single(x):
     end = time.time()
     return (end - start)
 
-peticions = [5000, 10000, 20000, 25000, 30000, 40000,50000,100000]
+peticions = [1000,2000,3000,4000,5000, 10000, 20000, 25000, 30000, 40000,50000,100000]
 temps_single = []
 temps_multiple2 = []
 temps_multiple3 = []
@@ -49,14 +49,14 @@ temps_multiple3 = []
 for pet in peticions:
     temps_single.append(execute_service_redis_single(pet))
 
-print("You have 30 seconds to start the second worker")
-time.sleep(30)
+print("Click enter when the second worker is enabled")
+input()
 
 for pet in peticions:
     temps_multiple2.append(execute_service_redis_single(pet))
 
-print("You have 30 seconds to start the third worker")
-time.sleep(30)
+print("Click enter when the second worker is enabled")
+input()
 
 for pet in peticions:
     temps_multiple3.append(execute_service_redis_single(pet))
@@ -78,3 +78,8 @@ plt.ylabel('Temps')
 plt.xticks(x_indices, peticions)
 plt.legend()
 plt.show()
+
+# [12.318198442459106, 29.047645807266235, 53.37272262573242, 64.83777403831482, 77.52104353904724, 103.1305615901947, 129.65053486824036, 263.27425837516785]
+# [8.255912780761719, 16.58026647567749, 33.33395051956177, 43.78534245491028, 53.26681184768677, 71.03668475151062, 88.39271330833435, 177.26926374435425]
+# [8.976412773132324, 17.719724416732788, 35.390369176864624, 44.537534952163696, 55.8190233707428, 73.35587525367737, 91.34531569480896, 183.3476378917694]
+# [5000, 10000, 20000, 25000, 30000, 40000, 50000, 100000]
