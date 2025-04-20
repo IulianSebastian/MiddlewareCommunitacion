@@ -14,18 +14,20 @@ insults = [
 
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
-def redis_client_single(x,f):
+def redis_client_single(x,f,barrier):
+    barrier.wait()
     for i in range(x):
         client.rpush("work_queue",f'{random.choice(insults)}{i}_{f}')
 
 def execute_service_redis_single(x):
     processos = []
     start = time.time()
-
+    
+    barrier = multiprocessing.Barrier(4)
     client.delete("listCensored")
 
     for i in range(4):
-        p = multiprocessing.Process(target=redis_client_single(x,i))
+        p = multiprocessing.Process(target=redis_client_single, args=(x, i, barrier))
         processos.append(p)
         p.start()
 
@@ -55,7 +57,7 @@ input()
 for pet in peticions:
     temps_multiple2.append(execute_service_redis_single(pet))
 
-print("Click enter when the second worker is enabled")
+print("Click enter when the third worker is enabled")
 input()
 
 for pet in peticions:
@@ -69,9 +71,9 @@ print(peticions)
 
 bar_width = 0.2
 x_indices = np.arange(len(peticions))
-plt.bar(x_indices - bar_width, temps_single, width=bar_width, label='Conjunto 1')
-plt.bar(x_indices, temps_multiple2, width=bar_width, label='Conjunto 2')
-plt.bar(x_indices + bar_width, temps_multiple3, width=bar_width, label='Conjunto 3')
+plt.bar(x_indices - bar_width, temps_single, width=bar_width, label='Single Node')
+plt.bar(x_indices, temps_multiple2, width=bar_width, label='Two Nodes')
+plt.bar(x_indices + bar_width, temps_multiple3, width=bar_width, label='Three Node')
 plt.title('Filter XMLRPC')
 plt.xlabel('Peticions')
 plt.ylabel('Temps')
@@ -79,7 +81,7 @@ plt.xticks(x_indices, peticions)
 plt.legend()
 plt.show()
 
-# [12.318198442459106, 29.047645807266235, 53.37272262573242, 64.83777403831482, 77.52104353904724, 103.1305615901947, 129.65053486824036, 263.27425837516785]
-# [8.255912780761719, 16.58026647567749, 33.33395051956177, 43.78534245491028, 53.26681184768677, 71.03668475151062, 88.39271330833435, 177.26926374435425]
-# [8.976412773132324, 17.719724416732788, 35.390369176864624, 44.537534952163696, 55.8190233707428, 73.35587525367737, 91.34531569480896, 183.3476378917694]
-# [5000, 10000, 20000, 25000, 30000, 40000, 50000, 100000]
+# [3.0933995246887207, 5.8338401317596436, 9.26704454421997, 12.187772512435913, 15.463058233261108, 31.616037845611572, 61.15545916557312, 77.2257080078125, 94.10784101486206, 123.07536840438843, 156.4419448375702, 302.82459783554077]
+# [2.212317943572998, 4.004438877105713, 6.138041257858276, 8.124750852584839, 10.267655611038208, 20.479697227478027, 41.64139223098755, 50.49235987663269, 61.054208517074585, 81.69934916496277, 102.30117750167847, 202.0143439769745]
+# [1.6043822765350342, 3.2062199115753174, 4.763687372207642, 6.195982217788696, 7.877846717834473, 16.20200276374817, 31.57068967819214, 39.85153341293335, 47.936761140823364, 64.18114423751831, 79.04687762260437, 168.38964939117432]
+# [1000, 2000, 3000, 4000, 5000, 10000, 20000, 25000, 30000, 40000, 50000, 100000]
