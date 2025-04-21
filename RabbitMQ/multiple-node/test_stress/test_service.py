@@ -2,6 +2,7 @@ import pika
 import time
 from multiprocessing import Process, Value, Lock
 from itertools import cycle
+from matplotlib import pyplot as plot
 
 SERVEIS = ["insultChannel1", "insultChannel2", "insultChannel3"]
 INSULTS = ["CAVERO", "UCRANIANO", "RUMANO", "VENEZOLANO", "REUSENC", "MOLARENC"]
@@ -48,22 +49,38 @@ def executar_test(total_peticions, num_processos, canals):
         p.start()
         processos.append(p)
 
-    # Esperar que los procesos terminen
     for p in processos:
         p.join()
     
     final = time.time()
     print(f"Peticions: {total_peticions}, Processos: {num_processos}, Canals: {len(canals)} -> Temps: {final - inici:.2f}s")
+    temps = final - inici
+    return temps
 
 def main():
     inicialitzar()
     peticions_tests = [5000, 10000, 20000, 25000, 30000, 40000, 50000, 100000]
     num_processos = 4
+    resultats = {}
 
     for canals_usats in [SERVEIS[:1], SERVEIS[:2], SERVEIS]:  # 1 canal, 2 canals, 3 canals
         print(f"\n-------Test amb {len(canals_usats)} node(s): {canals_usats}--------")
+        clau = len(canals_usats)
+        resultats[clau] = []
         for total in peticions_tests:
-            executar_test(total, num_processos, canals_usats)
+            temps = executar_test(total, num_processos, canals_usats)
+            resultats[clau].append(temps)
+    
+    for num_canals, temps_list in resultats.items():
+        plot.plot(peticions_tests, temps_list, label=f"{num_canals} canal(s)")
 
+    plot.xlabel("Nombre de peticions")
+    plot.ylabel("Temps (segons)")
+    plot.title("Escalabilitat RabbitMQ segons número de nodes")
+    plot.legend()
+    plot.grid(True)
+    plot.tight_layout()
+    plot.show()
+       
 if __name__ == "__main__":
     main()
