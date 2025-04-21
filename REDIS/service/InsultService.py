@@ -1,13 +1,15 @@
+#python3 InsultService.py InsultChannel(Channel of comunication with client) ObserverChannel
+import multiprocessing
+import random
 import redis
 import time
-import random
-import multiprocessing
+import sys
+
+insultChannel = sys.argv[1]
+observerChannel = sys.argv[2]
 
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
-
 setList = "setInsults"
-insultChannel= "insultChannel"
-observerChannel = "newsChannel"
 proc = None
 
 # Methods for the Broadcast Utility
@@ -26,7 +28,7 @@ def broadcaster():
         insultlist = client.smembers(setList)
         if insultlist:
             choice = random.choice(list(insultlist))
-            client.publish(observerChannel,choice)
+            client.publish(observerChannel, choice)
         time.sleep(5)
 
 # InsultService request and activate/deactivate.Broadcast
@@ -37,9 +39,11 @@ for message in pubsub.listen():
     if message["type"] == "message":
         match message["data"][0]:
             case "1":
+                print("Activating broadcast")
                 activateBroadcast()
             case "2":
+                print("Deactivating broadcast")
                 deactivateBroadcast()
             case _:
                 print(message["data"])
-                client.sadd(setList,message["data"])
+                client.sadd(setList, message["data"])

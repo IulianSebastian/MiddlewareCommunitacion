@@ -6,13 +6,14 @@ import subprocess
 import sys
 import time
 
+portServer = int(sys.argv[1])
 sender = None
 
 def insult_server():
     class RequestHandler(SimpleXMLRPCRequestHandler): 
         rpc_paths = ('/RPC2')
 
-    with SimpleXMLRPCServer(('localhost',8000),requestHandler=RequestHandler,allow_none=True) as server:
+    with SimpleXMLRPCServer(('localhost',portServer),requestHandler=RequestHandler,allow_none=True) as server:
         server.register_introspection_functions()
 
         manager = multiprocessing.Manager()
@@ -67,3 +68,5 @@ def insult_server():
 
 if __name__ == "__main__":
     insult_server()
+
+# Port of Server / Number of worker per server

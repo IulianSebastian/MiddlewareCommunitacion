@@ -1,16 +1,18 @@
-# xmlrpc IMPORT
+# python3 InsultService.py PortService
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 from xmlrpc.server import SimpleXMLRPCServer
-
 import multiprocessing
 import xmlrpc.client
 import random
 import time
+import sys
+
+portService = int(sys.argv[1])
 
 class RequestHandler(SimpleXMLRPCRequestHandler): 
     rpc_paths = ('/RPC2')
 
-with SimpleXMLRPCServer(('localhost',8000),requestHandler=RequestHandler,allow_none=True) as server:
+with SimpleXMLRPCServer(('localhost',portService),requestHandler=RequestHandler,allow_none=True) as server:
     server.register_introspection_functions()
 
     class InsultServer:

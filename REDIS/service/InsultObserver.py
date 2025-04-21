@@ -1,10 +1,12 @@
+#python3 InsultObserver ObserverChannel
 import redis
 import time
+import sys
 
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 pubsub = client.pubsub()
-observerChannel = "newsChannel"
+observerChannel = sys.argv[1]
 pubsub.subscribe(observerChannel)
 
 for message in pubsub.listen():
