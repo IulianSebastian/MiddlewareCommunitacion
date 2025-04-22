@@ -21,5 +21,4 @@ else:
 if sys.argv[3] == "service":
     client.publish(send,choice)
 elif sys.argv[3] == "filter":
-    client.rpush(send,f"Que te calles {choice} jaja")
-print(choice)
+    client.rpush(send,choice)
