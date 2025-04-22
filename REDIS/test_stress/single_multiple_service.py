@@ -57,7 +57,7 @@ temps_multiple2 = []
 temps_multiple3 = []
 
 for pet in peticions:
-    temps_multiple2.append(execute_service_redis_multiple(pet,["insultChannel"]))
+    temps_single.append(execute_service_redis_multiple(pet,["insultChannel"]))
 
 for pet in peticions:
     temps_multiple2.append(execute_service_redis_multiple(pet,["insultChannel","insultChannel2"]))
