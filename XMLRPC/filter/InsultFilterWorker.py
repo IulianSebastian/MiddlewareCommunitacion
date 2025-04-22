@@ -4,15 +4,16 @@ from xmlrpc.server import SimpleXMLRPCServer
 import xmlrpc.client
 import sys
 
-insults = [
-    "cavero",
-    "asshole",
-    "dumb",
-    "motherfucker"
-]
+# insults = [
+#     "cavero",
+#     "asshole",
+#     "dumb",
+#     "motherfucker"
+# ]
 
 portServer = int(sys.argv[1])
 portWorker = int(sys.argv[2])
+portService = int(sys.argv[3])
 
 s = xmlrpc.client.ServerProxy(f'http://localhost:{portServer}')
 s.add_worker(portWorker)
@@ -30,6 +31,7 @@ with SimpleXMLRPCServer(('localhost',portWorker),requestHandler=RequestHandler,a
             return self.phrases
 
         def work(self, phrase):
+            insults = xmlrpc.client.ServerProxy(f'http://localhost:{portService}').get_insults() 
             for insult in insults:
                 if insult in phrase:
                     self.phrases.append(phrase.replace(insult,"CENSORED"))

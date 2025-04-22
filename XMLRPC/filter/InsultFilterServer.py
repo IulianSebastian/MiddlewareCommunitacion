@@ -51,7 +51,7 @@ def insult_server():
                     work = work_to_do.pop(0)
                     if work:
                         worker.work(work)
-                # time.sleep(0.01)
+                time.sleep(0.01)
         
         server.register_instance(InsultFilterServer()) 
         server.serve_forever()
