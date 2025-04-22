@@ -1,4 +1,4 @@
-# python3 InsultFilterWorker PortServer PortWorker
+# python3 InsultFilterWorker PortServer PortWorker PortService
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 from xmlrpc.server import SimpleXMLRPCServer
 import xmlrpc.client
