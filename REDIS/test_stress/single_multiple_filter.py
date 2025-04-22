@@ -19,7 +19,7 @@ def redis_client_single(x,barrier):
     for i in range(x):
         client.rpush("work_queue",f'{random.choice(insults)}')
 
-def execute_service_redis_single(x):
+def execute_filter_redis_single(x):
     processos = []
     start = time.time()
     
@@ -50,19 +50,19 @@ temps_multiple2 = []
 temps_multiple3 = []
 
 for pet in peticions:
-    temps_single.append(execute_service_redis_single(pet))
+    temps_single.append(execute_filter_redis_single(pet))
 
 print("Click enter when the second worker is enabled")
 input()
 
 for pet in peticions:
-    temps_multiple2.append(execute_service_redis_single(pet))
+    temps_multiple2.append(execute_filter_redis_single(pet))
 
 print("Click enter when the third worker is enabled")
 input()
 
 for pet in peticions:
-    temps_multiple3.append(execute_service_redis_single(pet))
+    temps_multiple3.append(execute_filter_redis_single(pet))
 
 
 print(temps_single)

@@ -25,37 +25,6 @@ def redis_client_multiple(x, y, barrier,nodes):
         client.publish(node,f'{random.choice(insults)}')
         nodes.append(node)
 
-def redis_client_single(x,barrier):
-    barrier.wait()
-    for i in range(x):
-        client.publish(insultChannel,f'{random.choice(insults)}')
-
-def execute_service_redis_single(x):
-    processos = []
-    start = time.time()
-
-    # Crear barrera para sincronizar 4 procesos
-    barrier = multiprocessing.Barrier(4)
-    client.delete("setInsults")
-    client.delete("counter")
-
-    for i in range(4):
-        p = multiprocessing.Process(target=redis_client_single, args=(x,barrier))
-        processos.append(p)
-        p.start()
-
-    for p in processos:
-        p.join()
-
-    con = True
-    value = x*4
-    while con:
-        if (int(client.get("counter")) == value):
-            con = False
-
-    end = time.time()
-    return (end - start)
-
 def execute_service_redis_multiple(x,nodes):
     processos = []
     client.delete("setInsults")
@@ -88,8 +57,7 @@ temps_multiple2 = []
 temps_multiple3 = []
 
 for pet in peticions:
-    temps_single.append(execute_service_redis_single(pet))
-    print("done")
+    temps_multiple2.append(execute_service_redis_multiple(pet,["insultChannel"]))
 
 for pet in peticions:
     temps_multiple2.append(execute_service_redis_multiple(pet,["insultChannel","insultChannel2"]))

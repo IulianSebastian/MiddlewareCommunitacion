@@ -48,19 +48,19 @@ for pet in peticions:
     temps_single.append(execute_service_xmlrpc_single(pet))
     print("done")
 
-# print("Click enter when the second worker is enabled")
-# input()
+print("Click enter when the second worker is enabled")
+input()
 
-# for pet in peticions:
-#     temps_multiple2.append(execute_service_xmlrpc_single(pet))
-#     print("done")
+for pet in peticions:
+    temps_multiple2.append(execute_service_xmlrpc_single(pet))
+    print("done")
 
-# print("Click enter when the third worker is enabled")
-# input()
+print("Click enter when the third worker is enabled")
+input()
 
-# for pet in peticions:
-#     temps_multiple3.append(execute_service_xmlrpc_single(pet))
-#     print("done")
+for pet in peticions:
+    temps_multiple3.append(execute_service_xmlrpc_single(pet))
+    print("done")
 
 print(temps_single)
 print(temps_multiple2)

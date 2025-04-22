@@ -23,31 +23,6 @@ def xmlrpc_client_multiple(x, y, barrier,nodes):
         s.add_insult(f'{random.choice(insults)}')
         nodes.append(node)
 
-
-def xmlrpc_client_single(x,barrier):
-    s = xmlrpc.client.ServerProxy(f'http://localhost:8080')
-    barrier.wait()
-    for i in range(x):
-        s.add_insult(f'{random.choice(insults)}')
-
-
-def execute_service_xmlrpc_single(x):
-    processos = []
-
-    start = time.time()
-    barrier = multiprocessing.Barrier(4)
-
-    for i in range(4):
-        p = multiprocessing.Process(target=xmlrpc_client_single, args=(x, barrier))
-        processos.append(p)
-        p.start()
-
-    for p in processos:
-        p.join()
-
-    end = time.time()
-    return (end - start)
-
 def execute_service_xmlrpc_multiple(x,nodes):
     processos = []
 
@@ -71,20 +46,13 @@ temps_multiple2 = []
 temps_multiple3 = []
 
 for pet in peticions:
-    temps_single.append(execute_service_xmlrpc_single(pet))
-    print("done")
-    
-print("done2222")
+    temps_single.append(execute_service_xmlrpc_multiple(pet,["8080"]))
 
 for pet in peticions:
     temps_multiple2.append(execute_service_xmlrpc_multiple(pet,["8080","8081"]))
-    print("done")
-
-print("done2222")
 
 for pet in peticions:
     temps_multiple3.append(execute_service_xmlrpc_multiple(pet,["8080","8081","8082"]))
-    print("done")
 
 
 print(temps_single)

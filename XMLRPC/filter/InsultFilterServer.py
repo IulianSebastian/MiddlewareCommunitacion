@@ -51,28 +51,8 @@ def insult_server():
                     work = work_to_do.pop(0)
                     if work:
                         worker.work(work)
-                time.sleep(0.01)
-
-        # def sender_verify():
-        #     worker_process = {}
-        #     while True:
-        #         if len(work_to_do) != 0:
-        #             phrase = work_to_do.pop(0)
-        #             worked = False
-        #             while (not worked):
-        #                 for worker in workers:
-        #                     process = worker_process.get(worker)
-        #                     if (process is None) or (not process.is_alive()):
-        #                         workers.remove(worker)
-        #                         process = multiprocessing.Process(target=send_work,args=(worker,phrase))
-        #                         process.start()
-        #                         workers.append(worker)
-        #                         worked = True
-        #                         break
-
-        # sender = multiprocessing.Process(target=sender_verify)
-        # sender.start()
-
+                # time.sleep(0.01)
+        
         server.register_instance(InsultFilterServer()) 
         server.serve_forever()
 
