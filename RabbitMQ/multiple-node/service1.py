@@ -49,12 +49,16 @@ def listInsults(ch, props):
     ch.basic_publish(exchange='', routing_key=props.reply_to, body=response)
 
 def insult_me(ch,props):
-    if insults:
-        response=random.choice(insults)
-        print("Insult me...")
-    else:
-        response="NO HI HA INSULTS A LA LLISTA"
-    ch.basic_publish(exchange='', routing_key=props.reply_to, body=response) 
+    if props.reply_to:
+            start = time.time()
+            if insults:
+                response=random.choice(insults)
+                #print("Insult me...")
+            else:
+                response="NO HI HA INSULTS A LA LLISTA"
+            ch.basic_publish(exchange='', routing_key=props.reply_to, body=response)   
+            end= time.time()
+            
     
 def on_message(ch, method, properties, body):
     msg = body.decode().strip()
