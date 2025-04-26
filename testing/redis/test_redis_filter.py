@@ -6,6 +6,13 @@ import redis
 import time
 import os
 
+insults = [
+    "cavero",
+    "asshole",
+    "dumb",
+    "motherfucker"
+]
+
 class Testing(unittest.TestCase):
 
     @classmethod
@@ -16,6 +23,8 @@ class Testing(unittest.TestCase):
         cls.client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         cls.work_queue = "work_queue"
         cls.listCensored="listCensored"
+        for insult in insults:
+            cls.client.sadd("setInsults", insult)
 
     @classmethod
     def tearDownClass(cls):

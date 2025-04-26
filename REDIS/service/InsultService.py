@@ -46,4 +46,8 @@ for message in pubsub.listen():
                 deactivateBroadcast()
             case _:
                 print(message["data"])
-                client.sadd(setList, message["data"])
+                with client.pipeline() as pipe:
+                    pipe.multi()
+                    pipe.sadd(setList, message["data"])
+                    pipe.incr('counter')
+                    pipe.execute()

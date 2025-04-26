@@ -19,6 +19,7 @@ def insult_server():
         manager = multiprocessing.Manager()
         workers = manager.list()
         work_to_do = manager.list()
+        process_workers = []
 
         class InsultFilterServer:
 
@@ -34,35 +35,24 @@ def insult_server():
             def add_worker(self,port):
                 if port not in workers:
                     workers.append(port)
+                    process = multiprocessing.Process(target=send_work,args=(port,))
+                    process.start()
+                    process_workers.append(process)
 
             def done(self):
                 if len(work_to_do) != 0:
                     return False
                 return True
 
-        def send_work(port,phrase):
-            xmlrpc.client.ServerProxy(f'http://localhost:{port}').work(phrase)
-
-        def sender_verify():
-            worker_process = {}
+        def send_work(port):
+            worker = xmlrpc.client.ServerProxy(f'http://localhost:{port}')
             while True:
-                if len(work_to_do) != 0:
-                    phrase = work_to_do.pop(0)
-                    worked = False
-                    while (not worked):
-                        for worker in workers:
-                            process = worker_process.get(worker)
-                            if (process is None) or (not process.is_alive()):
-                                workers.remove(worker)
-                                process = multiprocessing.Process(target=send_work,args=(worker,phrase))
-                                process.start()
-                                workers.append(worker)
-                                worked = True
-                                break
-
-        sender = multiprocessing.Process(target=sender_verify)
-        sender.start()
-
+                if work_to_do:
+                    work = work_to_do.pop(0)
+                    if work:
+                        worker.work(work)
+                time.sleep(0.01)
+        
         server.register_instance(InsultFilterServer()) 
         server.serve_forever()
 
