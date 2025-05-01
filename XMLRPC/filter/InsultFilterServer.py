@@ -58,5 +58,3 @@ def insult_server():
 
 if __name__ == "__main__":
     insult_server()
-
-# Port of Server / Number of worker per server
