@@ -1,25 +1,21 @@
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plot
 import multiprocessing
 import numpy as np
 import random
 import redis
 import time
 
-insults = [
-    "cavero",
-    "asshole",
-    "dumb",
-    "motherfucker"
-]
+INSULTS = ["CAVERO", "UCRANIANO", "RUMANO", "VENEZOLANO", "REUSENC", "MOLARENC"]
+PETICIONS = [1000,2000,3000,4000,5000, 10000, 20000, 25000, 30000, 40000, 50000, 100000]
 
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
-def redis_client_single(x,barrier):
+def spam(x,barrier):
     barrier.wait()
-    for i in range(x):
-        client.rpush("work_queue",f'{random.choice(insults)}')
+    for _ in range(x):
+        client.rpush("work_queue",f'{random.choice(INSULTS)}')
 
-def execute_filter_redis_single(x):
+def executar_test(x):
     processos = []
     start = time.time()
     
@@ -27,8 +23,8 @@ def execute_filter_redis_single(x):
     client.delete("listCensored")
     client.delete("counter")
 
-    for i in range(4):
-        p = multiprocessing.Process(target=redis_client_single, args=(x, barrier))
+    for _ in range(4):
+        p = multiprocessing.Process(target=spam, args=(x, barrier))
         processos.append(p)
         p.start()
 
@@ -44,46 +40,36 @@ def execute_filter_redis_single(x):
     end = time.time()
     return (end - start)
 
-for insult in insults:
-    client.sadd("setInsults", insult)
+def inicialitzar_services():
+    for insult in INSULTS:
+        client.sadd("setInsults", insult)
 
-peticions = [1000,2000,3000,4000,5000, 10000, 20000, 25000, 30000, 40000,50000,100000]
-temps_single = []
-temps_multiple2 = []
-temps_multiple3 = []
+def main():
+    inicialitzar_services()
+    temps = {}
 
-for pet in peticions:
-    temps_single.append(execute_filter_redis_single(pet))
+    for service in range(1,4):
+        temps[service] = []
+        for pet in PETICIONS:
+            temps[service].append(executar_test(pet))
+        if (service < 3):
+            input(f"Click enter when the {service+1} worker is enabled" )
+    
+    print(temps)
 
-print("Click enter when the second worker is enabled")
-input()
+    for i in range(1,4):
+        plot.plot(PETICIONS, temps[i], label=f"{i} Nodes")
 
-for pet in peticions:
-    temps_multiple2.append(execute_filter_redis_single(pet))
+    plot.xlabel("Peticions")
+    plot.ylabel("Temps (segons)")
+    plot.title("Test Stress Filter")
+    plot.legend()
+    plot.grid(True)
+    plot.tight_layout()
+    plot.show()
 
-print("Click enter when the third worker is enabled")
-input()
-
-for pet in peticions:
-    temps_multiple3.append(execute_filter_redis_single(pet))
-
-
-print(temps_single)
-print(temps_multiple2)
-print(temps_multiple3)
-print(peticions)
-
-bar_width = 0.2
-x_indices = np.arange(len(peticions))
-plt.bar(x_indices - bar_width, temps_single, width=bar_width, label='Single Node')
-plt.bar(x_indices, temps_multiple2, width=bar_width, label='Two Nodes')
-plt.bar(x_indices + bar_width, temps_multiple3, width=bar_width, label='Three Node')
-plt.title('Filter XMLRPC')
-plt.xlabel('Peticions')
-plt.ylabel('Temps')
-plt.xticks(x_indices, peticions)
-plt.legend()
-plt.show()
+if __name__ == "__main__":
+    main()
 
 # [3.0933995246887207, 5.8338401317596436, 9.26704454421997, 12.187772512435913, 15.463058233261108, 31.616037845611572, 61.15545916557312, 77.2257080078125, 94.10784101486206, 123.07536840438843, 156.4419448375702, 302.82459783554077]
 # [2.212317943572998, 4.004438877105713, 6.138041257858276, 8.124750852584839, 10.267655611038208, 20.479697227478027, 41.64139223098755, 50.49235987663269, 61.054208517074585, 81.69934916496277, 102.30117750167847, 202.0143439769745]

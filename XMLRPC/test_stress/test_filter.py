@@ -7,7 +7,7 @@ import numpy as np
 
 SERVICE_PORT = ["8080","8081","8082"]
 INSULTS = ["CAVERO", "UCRANIANO", "RUMANO", "VENEZOLANO", "REUSENC", "MOLARENC"]
-PETICIONS = [1000,2000]
+PETICIONS = [1000,2000,3000,4000,5000, 10000, 20000, 25000, 30000, 40000, 50000, 100000]
 server_filter = xmlrpc.client.ServerProxy(f'http://localhost:8000')
 
 def spam(x,barrier):
@@ -59,7 +59,7 @@ def main():
 
     plot.xlabel("Peticions")
     plot.ylabel("Temps (segons)")
-    plot.title("Test Stress Service")
+    plot.title("Test Stress Filter")
     plot.legend()
     plot.grid(True)
     plot.tight_layout()
