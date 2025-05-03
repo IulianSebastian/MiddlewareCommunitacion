@@ -3,6 +3,7 @@ import subprocess
 import unittest
 import signal
 import redis
+import json
 import time
 import os
 
@@ -16,7 +17,6 @@ class Testing(unittest.TestCase):
         cls.client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         cls.setList = "setInsults"
         cls.insultChannel= "insultChannel"
-        cls.observerChannel = "newsChannel"
 
     @classmethod
     def tearDownClass(cls):
@@ -25,11 +25,33 @@ class Testing(unittest.TestCase):
     def test_addInsult(cls):
         cls.client.delete(cls.setList)
         choice = "loco"
-        for i in range(10):
-            cls.client.publish(cls.insultChannel,choice)
+        
+        for _ in range(10):
+            cls.client.publish(cls.insultChannel,json.dumps({"pet":choice}))
+
         time.sleep(2)
-        set = cls.client.smembers(cls.setList)
+        
+        cls.client.publish(cls.insultChannel,json.dumps({"pet":"3","queue":"this_queue"}))
+        while True:
+            result = cls.client.blpop("this_queue",timeout=0)
+            if result:
+                set = list((json.loads(result[1]))["result"])
+                break
+
         if choice in set and len(set) == 1:
+            cls.assertTrue(True)
+        else:
+            cls.assertTrue(False)
+    
+    def test_insultme(cls):
+        cls.client.publish(cls.insultChannel,json.dumps({"pet":"4","queue":"this_queue"}))
+        while True:
+            result = cls.client.blpop("this_queue",timeout=0)
+            if result:
+                insultme = (json.loads(result[1]))["result"]
+                break
+
+        if  insultme == "loco":
             cls.assertTrue(True)
         else:
             cls.assertTrue(False)
@@ -37,17 +59,15 @@ class Testing(unittest.TestCase):
     def test_broadcast(cls):
 
         messageObserver = None
-        cls.client.publish("insultChannel","1")
+        cls.client.publish(cls.insultChannel,json.dumps({"pet":"1"}))
         
         pubsub = cls.client.pubsub()
         pubsub.subscribe("observerChannel")
 
         for message in pubsub.listen():
-            print("here")
             if message["type"] == "message":
-                print(message)
-                messageObserver = message["data"]
-                cls.client.publish("insultChannel","2")
+                messageObserver = json.loads(message['data'])["result"]
+                cls.client.publish(cls.insultChannel,json.dumps({"pet":"2"}))
                 break
 
         cls.assertEqual("loco",messageObserver)
