@@ -56,7 +56,7 @@ def main():
 
     plot.xlabel("Nombre de peticions")
     plot.ylabel("Temps (segons)")
-    plot.title("Escalabilitat segons número de filtres (nodes)")
+    plot.title("Escalabilitat segons número de serveis (nodes)")
     plot.legend()
     plot.grid(True)
     plot.tight_layout()

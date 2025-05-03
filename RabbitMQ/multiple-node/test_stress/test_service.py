@@ -1,18 +1,19 @@
 import pika
 import time
 from multiprocessing import Process, Value, Lock
-from itertools import cycle
+from worker import Worker
+from workerFilter import WorkerFilter
 from matplotlib import pyplot as plot
 
-SERVEIS = ["insultChannel1", "insultChannel2", "insultChannel3"]
 INSULTS = ["CAVERO", "UCRANIANO", "RUMANO", "VENEZOLANO", "REUSENC", "MOLARENC"]
+WORKQUEUE = "WorkQueue"
+INSULTQUEUE = "insultChannel"
 
-def spam(counter, lock, n_peticions, canals):
-    rr = cycle(canals)
-    resposta = {"r": None}
+def spam(counter, lock, n_peticions):
     conn = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     canal = conn.channel()
     q = canal.queue_declare(queue='', exclusive=True).method.queue
+    resposta = {"r": None}
 
     def callback(ch, method, props, body):
         resposta["r"] = body.decode()
@@ -21,66 +22,89 @@ def spam(counter, lock, n_peticions, canals):
 
     for _ in range(n_peticions):
         resposta["r"] = None
-        canal.basic_publish(exchange='', routing_key=next(rr), properties=pika.BasicProperties(reply_to=q), body='4')
-        
+        canal.basic_publish(
+            exchange='',
+            routing_key=WORKQUEUE,
+            body="Ets un cavero i reusenc",
+            properties=pika.BasicProperties(reply_to=q)
+        )
+
         while resposta["r"] is None:
             conn.process_data_events()
-            
+
         with lock:
             counter.value += 1
+
+    conn.close()
 
 def inicialitzar():
     conn = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     canal = conn.channel()
-    
-    for servei in SERVEIS:
-        for insult in INSULTS:
-            canal.basic_publish(exchange='', routing_key=servei, body=insult)
 
-def executar_test(total_peticions, num_processos, canals):
+    canal.queue_declare(queue=INSULTQUEUE, durable=False)
+    canal.queue_purge(queue=INSULTQUEUE)
+
+    for insult in INSULTS:
+        canal.basic_publish(exchange='', routing_key=INSULTQUEUE, body=insult)
+
+    conn.close()
+
+def executar_test(total_peticions, num_processos, num_nodes):
     contador = Value('i', 0)
     lock = Lock()
     processos = []
-    peticions_per_proc = total_peticions // num_processos
+    workers = []
 
+    for _ in range(num_nodes):
+        w = Process(target=Worker)
+        f = Process(target=WorkerFilter)
+        w.start()
+        f.start()
+        workers.extend([w, f])
+
+    peticions_per_proc = total_peticions // num_processos
     inici = time.time()
+
     for _ in range(num_processos):
-        p = Process(target=spam, args=(contador, lock, peticions_per_proc, canals))
+        p = Process(target=spam, args=(contador, lock, peticions_per_proc))
         p.start()
         processos.append(p)
 
     for p in processos:
         p.join()
-    
+
     final = time.time()
-    print(f"Peticions: {total_peticions}, Processos: {num_processos}, Canals: {len(canals)} -> Temps: {final - inici:.2f}s")
-    temps = final - inici
-    return temps
+
+    for w in workers:
+        w.terminate()
+        w.join()
+
+    print(f"Peticions: {total_peticions}, Clients: {num_processos}, Nodes: {num_nodes} -> Temps: {final - inici:.2f}s")
+    return final - inici
 
 def main():
-    inicialitzar()
-    peticions_tests = [5000, 10000, 20000, 25000, 30000, 40000, 50000, 100000]
+    peticions_tests = [5000, 10000, 20000, 30000, 40000, 50000, 100000]
     num_processos = 4
     resultats = {}
 
-    for canals_usats in [SERVEIS[:1], SERVEIS[:2], SERVEIS]:  # 1 canal, 2 canals, 3 canals
-        print(f"\n-------Test amb {len(canals_usats)} node(s): {canals_usats}--------")
-        clau = len(canals_usats)
-        resultats[clau] = []
+    for num_nodes in [1, 2, 3]:
+        print(f"\n-------Test amb {num_nodes} node(s)--------")
+        resultats[num_nodes] = []
         for total in peticions_tests:
-            temps = executar_test(total, num_processos, canals_usats)
-            resultats[clau].append(temps)
-    
-    for num_canals, temps_list in resultats.items():
-        plot.plot(peticions_tests, temps_list, label=f"{num_canals} canal(s)")
+            inicialitzar()
+            temps = executar_test(total, num_processos, num_nodes)
+            resultats[num_nodes].append(temps)
+
+    for num_nodes, temps_list in resultats.items():
+        plot.plot(peticions_tests, temps_list, label=f"{num_nodes} node(s)")
 
     plot.xlabel("Nombre de peticions")
     plot.ylabel("Temps (segons)")
-    plot.title("Escalabilitat RabbitMQ segons número de nodes")
+    plot.title("Escalabilitat RabbitMQ segons número de nodes (Worker + Filter)")
     plot.legend()
     plot.grid(True)
     plot.tight_layout()
     plot.show()
-       
+
 if __name__ == "__main__":
     main()

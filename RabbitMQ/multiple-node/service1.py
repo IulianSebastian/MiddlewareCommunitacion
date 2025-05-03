@@ -53,7 +53,7 @@ def insult_me(ch,props):
             start = time.time()
             if insults:
                 response=random.choice(insults)
-                #print("Insult me...")
+                print("Insult me...")
             else:
                 response="NO HI HA INSULTS A LA LLISTA"
             ch.basic_publish(exchange='', routing_key=props.reply_to, body=response)   
