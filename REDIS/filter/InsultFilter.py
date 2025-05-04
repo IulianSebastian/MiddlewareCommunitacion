@@ -38,5 +38,6 @@ while True:
         if msg["pet"] == "3":
             listInsults(msg["queue"])
         else:
+            print("message")
             censore(message=msg["pet"])
 

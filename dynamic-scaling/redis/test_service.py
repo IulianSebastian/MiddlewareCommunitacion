@@ -51,7 +51,7 @@ def main():
     service = "service"
     temps[service] = []
     for pet in PETICIONS:
-        print(f"Fent {pet} amb 4 cients")
+        print(f"Fent {pet} amb 4 clients")
         temps[service].append(executar_test(pet))
     
     print(temps)
@@ -68,3 +68,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# [4.884342670440674, 5.41038966178894, 7.965413331985474, 10.794987201690674, 13.614169359207153, 27.748843908309937, 70.31820511817932, 85.34203910827637, 115.12121725082397, 143.6594202518463, 288.3577506542206]

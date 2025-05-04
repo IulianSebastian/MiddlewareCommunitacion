@@ -45,7 +45,7 @@ def calcul_nodes():
 def calcul_lambda():
     global anterior_lambda, missatges_s
     estat_cua = canal.queue_declare(queue='countChannel', passive=True)
-    print(estat_cua)
+    # print(estat_cua)
     lambd=estat_cua.method.message_count/5.0
     aux = anterior_lambda
     anterior_lambda= lambd
