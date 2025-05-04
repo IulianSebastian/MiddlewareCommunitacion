@@ -5,7 +5,7 @@ import pika
 import time
 
 INSULTS = ["CAVERO", "UCRANIANO", "MOLARENC", "REUSENC", "RUMANO"]
-PETICIONS = [1000,2000,3000,4000,5000,10000,25000, 30000, 40000, 50000, 100000]
+PETICIONS = [1000,2000,3000,4000,5000,10000,20000,25000, 30000, 40000, 50000, 100000]
 
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
