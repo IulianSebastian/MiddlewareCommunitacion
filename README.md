@@ -2,6 +2,32 @@
 
 > [!WARNING]
 > We recommend using Linux as OS and not Windows 10/11 because Windows can give errors with the multiprocessing 
+## Testing Requirements
+
+> ⚠️ **Important:** The following libraries and services must be installed before running the project.
+
+### Installation Commands
+
+```bash
+# Update package list
+sudo apt update
+
+# Install Redis and its Python client
+sudo apt install redis-server -y
+pip3 install redis
+
+# Install RabbitMQ and its Python client
+sudo apt install rabbitmq-server -y
+pip3 install pika
+
+# Enable and start RabbitMQ service
+sudo systemctl enable rabbitmq-server
+sudo systemctl start rabbitmq-server
+
+# Install Pyro4 for remote object communication
+pip3 install Pyro4
+```
+
 
 ## Testing Xmlrpc
 > [!CAUTION]
@@ -62,11 +88,12 @@ When the test finishes is going to open a graphic showing a comparation between 
 
 ## Testing Pyro
 > [!CAUTION]
-> Every command that is here as to be executed in his own terminal (shell) if it's not indicated otherwise
+> Every command that is here as to be executed in his own terminal (shell) if it's not indicated otherwise.
+> For both tests, the Pyro name server must be running:
+> ```bash
+> python3 -m Pyro4.naming
+> ```
 ### For testing InsultService
-```
-python3 -m Pyro4.naming
-```
 ```
 python3 service1.py
 ```
@@ -80,9 +107,6 @@ python3 service3.py
 python3 test_service.py
 ```
 ### For testing InsulFilter
-```
-python3 -m Pyro4.naming
-```
 ```
 python3 service1.py
 ```
@@ -151,15 +175,6 @@ When the test finishes is going to open a graphic showing a comparation between 
 > [!CAUTION]
 > Every command that is here as to be executed in his own terminal (shell) if it's not indicated otherwise
 ### For testing InsultService
-```
-python3 service1.py
-```
-```
-python3 service2.py
-```
-```
-python3 service3.py
-```
 ```
 python3 test_service.py
 ```
