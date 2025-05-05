@@ -88,11 +88,12 @@ When the test finishes is going to open a graphic showing a comparation between 
 
 ## Testing Pyro
 > [!CAUTION]
-> Every command that is here as to be executed in his own terminal (shell) if it's not indicated otherwise
+> Every command that is here as to be executed in his own terminal (shell) if it's not indicated otherwise.
+> For both tests, the Pyro name server must be running:
+> ```bash
+> python3 -m Pyro4.naming
+> ```
 ### For testing InsultService
-```
-python3 -m Pyro4.naming
-```
 ```
 python3 service1.py
 ```
@@ -106,9 +107,6 @@ python3 service3.py
 python3 test_service.py
 ```
 ### For testing InsulFilter
-```
-python3 -m Pyro4.naming
-```
 ```
 python3 service1.py
 ```
