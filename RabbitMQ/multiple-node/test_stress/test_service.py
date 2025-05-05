@@ -2,18 +2,16 @@ import pika
 import time
 from multiprocessing import Process, Value, Lock
 from worker import Worker
-from workerFilter import WorkerFilter
 from matplotlib import pyplot as plot
 
 INSULTS = ["CAVERO", "UCRANIANO", "RUMANO", "VENEZOLANO", "REUSENC", "MOLARENC"]
-WORKQUEUE = "WorkQueue"
-INSULTQUEUE = "insultChannel"
+QUEUE_NAME = "insultChannel"
 
 def spam(counter, lock, n_peticions):
+    resposta = {"r": None}
     conn = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     canal = conn.channel()
     q = canal.queue_declare(queue='', exclusive=True).method.queue
-    resposta = {"r": None}
 
     def callback(ch, method, props, body):
         resposta["r"] = body.decode()
@@ -22,12 +20,7 @@ def spam(counter, lock, n_peticions):
 
     for _ in range(n_peticions):
         resposta["r"] = None
-        canal.basic_publish(
-            exchange='',
-            routing_key=WORKQUEUE,
-            body="Ets un cavero i reusenc",
-            properties=pika.BasicProperties(reply_to=q)
-        )
+        canal.basic_publish(exchange='', routing_key=QUEUE_NAME, properties=pika.BasicProperties(reply_to=q), body='4')
 
         while resposta["r"] is None:
             conn.process_data_events()
@@ -40,14 +33,15 @@ def spam(counter, lock, n_peticions):
 def inicialitzar():
     conn = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     canal = conn.channel()
-
-    canal.queue_declare(queue=INSULTQUEUE, durable=False)
-    canal.queue_purge(queue=INSULTQUEUE)
+    
+    canal.queue_declare(queue=QUEUE_NAME, durable=False)
+    canal.queue_purge(queue=QUEUE_NAME)
 
     for insult in INSULTS:
-        canal.basic_publish(exchange='', routing_key=INSULTQUEUE, body=insult)
-
+        canal.basic_publish(exchange='', routing_key=QUEUE_NAME, body=insult)
+    
     conn.close()
+
 
 def executar_test(total_peticions, num_processos, num_nodes):
     contador = Value('i', 0)
@@ -57,10 +51,8 @@ def executar_test(total_peticions, num_processos, num_nodes):
 
     for _ in range(num_nodes):
         w = Process(target=Worker)
-        f = Process(target=WorkerFilter)
         w.start()
-        f.start()
-        workers.extend([w, f])
+        workers.append(w)
 
     peticions_per_proc = total_peticions // num_processos
     inici = time.time()
@@ -83,15 +75,15 @@ def executar_test(total_peticions, num_processos, num_nodes):
     return final - inici
 
 def main():
+    inicialitzar()
     peticions_tests = [5000, 10000, 20000, 30000, 40000, 50000, 100000]
     num_processos = 4
     resultats = {}
 
-    for num_nodes in [1, 2, 3]:
+    for num_nodes in [1, 2, 3]: 
         print(f"\n-------Test amb {num_nodes} node(s)--------")
         resultats[num_nodes] = []
         for total in peticions_tests:
-            inicialitzar()
             temps = executar_test(total, num_processos, num_nodes)
             resultats[num_nodes].append(temps)
 
@@ -100,7 +92,7 @@ def main():
 
     plot.xlabel("Nombre de peticions")
     plot.ylabel("Temps (segons)")
-    plot.title("Escalabilitat RabbitMQ segons número de nodes (Worker + Filter)")
+    plot.title("Escalabilitat RabbitMQ segons número de nodes (consumidors)")
     plot.legend()
     plot.grid(True)
     plot.tight_layout()
