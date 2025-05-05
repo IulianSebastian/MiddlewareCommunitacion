@@ -118,28 +118,30 @@ python3 InsultService2.py insultChannel ob2
 python3 InsultService3.py insultChannel ob3
 ```
 ```
-python3 single_multiple_service.py
+python3 test_service.py
 ```
 ### For testing InsultFilter
+> [!IMPORTANT]
+> For executing this tests you have to execute the commands for the Redis InsultService but without the las command that is test_service.py of course each one of them in a different terminal
 ```
-python3 InsultFilter.py work_queue
+python3 InsultFilter.py work_queue insultChannel queue
 ```
 > [!NOTE]
 > If you see a step that is to wait until something happens or if you need to interact with some bash will be about this one
 > ```
-> python3 single_multiple_filter.py
+> python3 test_filter.py
 > ```
 
 Wait here until the bash from the note says to start the second and then pres enter. If the message has been printed we do this steps (in new bash every steps):
 ```
-python3 InsultFilter.py work_queue
+python3 InsultFilter.py work_queue insultChannel2 queue2
 ```
 Once this steps that are up of this message are done we can pres enter on the bash from the note.
 
 Wait here until the bash from the note says to start the second and then pres enter. If the message has been printed we do this steps (in new bash every steps):
 
 ```
-python3 InsultFilter.py work_queue
+python3 InsultFilter.py work_queue insultChannel3 queue3
 ```
 Once this steps that are up of this message are done we can pres enter on the bash from the note.
 
@@ -189,12 +191,3 @@ python3 test_service.py
 >   Redis: Change the connection string passed as an argument.</br>
 >   Pyro and RabbitMQ: You need to modify the specific lines of code of those variables.</br>
 >   However, changing these configurations can disrupt the stress tests, likely because the tests are designed to work with specific settings.
-
-> [!TIP]
-> This is a tip
-
-> [!IMPORTANT]
-> This is important information
-
-> [!WARNING]
-> This is a warning
