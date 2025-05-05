@@ -26,7 +26,7 @@ sudo systemctl start rabbitmq-server
 
 # Install Pyro4 for remote object communication
 pip3 install Pyro4
-
+```
 
 
 ## Testing Xmlrpc
