@@ -176,15 +176,6 @@ When the test finishes is going to open a graphic showing a comparation between 
 > Every command that is here as to be executed in his own terminal (shell) if it's not indicated otherwise
 ### For testing InsultService
 ```
-python3 service1.py
-```
-```
-python3 service2.py
-```
-```
-python3 service3.py
-```
-```
 python3 test_service.py
 ```
 ### For testing InsulFilter
