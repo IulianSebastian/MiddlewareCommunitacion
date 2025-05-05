@@ -1,11 +1,6 @@
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="Pyro4")
-
 import unittest
 import Pyro4
 import time
-import warnings
-import threading
 
 
 
