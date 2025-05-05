@@ -2,6 +2,32 @@
 
 > [!WARNING]
 > We recommend using Linux as OS and not Windows 10/11 because Windows can give errors with the multiprocessing 
+## Testing Requirements
+
+> ⚠️ **Important:** The following libraries and services must be installed before running the project.
+
+### Installation Commands
+
+```bash
+# Update package list
+sudo apt update
+
+# Install Redis and its Python client
+sudo apt install redis-server -y
+pip3 install redis
+
+# Install RabbitMQ and its Python client
+sudo apt install rabbitmq-server -y
+pip3 install pika
+
+# Enable and start RabbitMQ service
+sudo systemctl enable rabbitmq-server
+sudo systemctl start rabbitmq-server
+
+# Install Pyro4 for remote object communication
+pip3 install Pyro4
+
+
 
 ## Testing Xmlrpc
 > [!CAUTION]
