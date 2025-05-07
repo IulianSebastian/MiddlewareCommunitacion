@@ -176,6 +176,15 @@ When the test finishes is going to open a graphic showing a comparation between 
 > Every command that is here as to be executed in his own terminal (shell) if it's not indicated otherwise
 ### For testing InsultService
 ```
+python3 service1.py
+```
+```
+python3 service2.py
+```
+```
+python3 service3.py
+```
+```
 python3 test_service.py
 ```
 ### For testing InsulFilter
@@ -200,9 +209,29 @@ python3 filter3.py
 ```
 python3 test_service.py
 ```
+## Testing Dynamic_Scaling
+> [!CAUTION]
+> Every command that is here as to be executed in his own terminal (shell) if it's not indicated otherwise
+### For testing InsultService
+```
+python3 scaler.py
+```
+```
+python3 test_service.py
+```
+### For testing InsulFilter
+```
+python3 scaler.py
+```
+```
+python3 scaler_filter.py
+```
+```
+python3 test_filter.py
+```
 > [!NOTE]
-> Changes that you can make simply : </br>
->   XML-RPC: You can change the port by modifying the number passed as an argument.</br>
->   Redis: Change the connection string passed as an argument.</br>
->   Pyro and RabbitMQ: You need to modify the specific lines of code of those variables.</br>
->   However, changing these configurations can disrupt the stress tests, likely because the tests are designed to work with specific settings.
+> Changes that you can make simply : 
+> - XML-RPC: You can change the port by modifying the number passed as an argument.
+> - Redis: Change the connection string passed as an argument.
+> - Pyro and RabbitMQ: You need to modify the specific lines of code of those variables.
+> - However, changing these configurations can disrupt the stress tests, likely because the tests are designed to work with specific settings.
